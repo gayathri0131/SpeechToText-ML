@@ -3,7 +3,7 @@ import whisper
 import os
 
 app = Flask(__name__)
-model = whisper.load_model("base")
+model = whisper.load_model("tiny")
 
 UPLOAD_FOLDER = os.path.join(os.getcwd(), "uploads")
 if not os.path.exists(UPLOAD_FOLDER):
@@ -30,3 +30,6 @@ def convert_audio():
 
 if __name__ == "__main__":
     app.run(debug=True)
+    
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
