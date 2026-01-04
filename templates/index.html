@@ -2,105 +2,124 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Speech To Text</title>
+<title>Speech to Text Converter</title>
+
 <style>
-    body {
-        font-family: Arial, sans-serif; background: #f2f2f2;
-        text-align: center; padding: 30px;
-    }
-    .container {
-        display: flex; justify-content: center; gap: 80px;
-        margin-top: 40px;
-    }
-    .card {
-        width: 260px; background: #fff; padding: 20px;
-        border-radius: 10px; box-shadow: 0 0 8px #ccc;
-    }
-    button {
-        padding: 10px 20px; border: none; cursor: pointer;
-        border-radius: 8px; background: #007bff; color: #fff;
-        font-size: 16px;
-    }
-    #output {
-        margin-top: 50px; width: 80%; height: 200px;
-        padding: 20px; font-size: 18px;
-        border: 2px solid #007bff; border-radius: 10px;
-        background: #fff; text-align: left;
-    }
+body {
+    background: #f4f6f8;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    text-align: center;
+    margin-top: 30px;
+    color: #111827;
+}
+
+.subtitle {
+    text-align: center;
+    color: #6b7280;
+    margin-bottom: 30px;
+}
+
+.card {
+    background: white;
+    width: 70%;
+    margin: auto;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    gap: 30px;
+}
+
+.left, .right {
+    width: 50%;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 8px;
+    background: #4f46e5;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #4338ca;
+}
+
+input[type="file"] {
+    width: 100%;
+    margin-top: 10px;
+}
+
+textarea {
+    width: 100%;
+    height: 180px;
+    margin-top: 20px;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+footer {
+    text-align: center;
+    margin-top: 30px;
+    color: #6b7280;
+}
 </style>
 </head>
+
 <body>
 
-<h2>Speech To Text Converter </h2>
+<h1>🎤 Speech to Text Converter</h1>
+<p class="subtitle">AI-powered Speech Recognition using ML</p>
 
-<div class="container">
+<div class="card">
 
-    <!-- File to Text -->
-    <div class="card">
-        <h3>Upload Audio File</h3>
-        <input type="file" id="audioFile"><br><br>
-        <p id="fileName"></p>
-        <button onclick="convertFile()">Convert</button>
+    <div class="controls">
+
+        <!-- LEFT SIDE -->
+        <div class="left">
+            <h3>Upload Audio File</h3>
+            <form action="/upload" method="post" enctype="multipart/form-data">
+                <input type="file" name="audio">
+                <button type="submit">Convert Audio</button>
+            </form>
+        </div>
+
+        <!-- RIGHT SIDE -->
+        <div class="right">
+            <h3>Live Microphone</h3>
+            <form action="/mic" method="post">
+                <button type="submit">Start Listening</button>
+            </form>
+        </div>
+
     </div>
 
-    <!-- Microphone Input -->
-    <div class="card">
-        <h3>Microphone</h3>
-        <button onclick="toggleMic()"> Start Listening</button>
-    </div>
+    <!-- OUTPUT -->
+    <textarea readonly placeholder="Converted text will appear here...">
+{{ result if result else "" }}
+    </textarea>
 
 </div>
 
-<!-- Shared Output Box -->
-<textarea id="output" placeholder="Text will appear here..." readonly></textarea>
-
-<script>
-let recognition;
-if ("webkitSpeechRecognition" in window) {
-    recognition = new webkitSpeechRecognition();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-
-    recognition.onresult = (event) => {
-        let text = "";
-        for (let i = 0; i < event.results.length; i++) {
-            text += event.results[i][0].transcript;
-        }
-        document.getElementById("output").value = text;
-    };
-} else {
-    alert("Speech Recognition not supported in this browser.");
-}
-
-function toggleMic() {
-    recognition.start();
-}
-
-// Choose File Label
-document.getElementById("audioFile").addEventListener("change", function () {
-    document.getElementById("fileName").innerText = "Selected: " + this.files[0].name;
-});
-
-// Convert File Button
-function convertFile() {
-    let file = document.getElementById("audioFile").files[0];
-    if (!file) return alert("Please select a file!");
-
-    let formData = new FormData();
-    formData.append("audio_file", file);
-
-    fetch("/convert", {
-        method: "POST",
-        body: formData,
-    })
-        .then((res) => res.json())
-        .then((data) => {
-            if (data.text) {
-                document.getElementById("output").value = data.text;
-            }
-        });
-}
-</script>
+<footer>
+    <p>Built with ❤️ using Flask & Whisper ML</p>
+</footer>
 
 </body>
 </html>
